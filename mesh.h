@@ -1,14 +1,16 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "draw.h"
-#include "matrix.h"
-
 #define VERTEX 0
 #define FACE 1
 
-void parse(struct matrix *polygons, char *obj);
-void add_points(struct matrix *points, double vals[4], int t);
+#include "matrix.h"
+#include "draw.h"
+
+char * parse_slash(char *line);
+char ** parse_args(char *line);
+void parse_obj(struct matrix *polygons, char *file);
+void add_mesh_point( struct matrix *points, double values[4], int type);
 void add_mesh(struct matrix *polygons, struct matrix *vertices, struct matrix *faces);
 
 #endif
