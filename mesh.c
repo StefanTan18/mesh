@@ -6,38 +6,28 @@
 #include "matrix.h"
 #include "draw.h"
 
-
-char * parse_slash(char *line) {
-  char * s = calloc (sizeof(char), 1);
-  strcpy(s, strsep(&line, "/"));
-  return s;
-}
-
-char ** parse_args(char *line){
+//goes through each line and parses args
+char ** args_parser(char *line){
   char ** arr = calloc(sizeof(char*), 10);
   int i = 0;
   while (line) {
     arr[i] = strsep(&line, " ");
     if (strcmp(arr[i], "") != 0) {
-      arr[i] = parse_slash(arr[i]);
+      char * s = calloc(sizeof(char), 1);
+      strcpy(s, strsep(&line, "/"))
+      arr[i] = s;
       i++;
     }
   }
   return arr;
-} //end parse_args
+}
 
-/*======== void parse_obj() ==========
-  Inputs:   struct matrix *polygons
-            char *file
-  Parses .obj file for vertices and faces
-  Calls add_mesh()
-  ====================*/
-void parse_obj(struct matrix *polygons, char *file) {
-  //matrices to store object data
+//parses .obj file for vertices and faces
+void obj_parser(struct matrix *polygons, char *file) {
+
   struct matrix * vertices;
   struct matrix * faces;
 
-  //file parsing vars
   FILE *f;
   char line[255];
 
@@ -46,17 +36,14 @@ void parse_obj(struct matrix *polygons, char *file) {
 
   char ** args;
 
-  //initialize matrices, 3 for vertices, 4 for triangle+quadrilateral faces
   vertices = new_matrix(3, 100);
   faces = new_matrix(4, 100);
 
   f = fopen(file, "r");
   while ( fgets(line, sizeof(line), f) != NULL ) {
     line[strlen(line) - 1] = '\0';
-    //printf("%s\n", line);
 
-    //if vertex,
-    //then sscanf for type, values -> add vertex to vertices
+    //vertices
     if (strncmp(line, "v", 1) == 0) {
       sscanf(line, "%s %lf %lf %lf", type, values, values+1, values+2);
       if (strncmp(type, "v", strlen(type)) == 0) {
@@ -64,31 +51,21 @@ void parse_obj(struct matrix *polygons, char *file) {
       }
     }
 
-    //if face
-    //parse face or values -> add face to faces
+    //faces
     else if (strncmp(line, "f", 1) == 0) {
-      args = parse_args(line);
+      args = args_parser(line);
       int i = 0;
       while (args[i+1] && (i < 4)) {
-        //printf(args[i]);
         values[i] = atof(args[i+1]);
         i++;
       }
-      //printf("\tparts:%d\n", i);
       add_mesh_point(faces, values, FACE);
     }
   }
-
   add_mesh(polygons, vertices, faces);
 }
 
-/*======== void add_mesh_point() ==========
-Inputs:   struct matrix * points
-          double values
-Returns:
-adds point (x, y, z) or face (a, b, c) to points and increment points.lastcol
-if points is full, should call grow on points
-====================*/
+//adds points or faces to points
 void add_mesh_point(struct matrix * points, double values[4], int type) {
 
   if ( points->lastcol == points->cols )
@@ -101,14 +78,9 @@ void add_mesh_point(struct matrix * points, double values[4], int type) {
     points->m[3][ points->lastcol ] = values[3];
   }
   points->lastcol++;
-} //end add_mesh_point
+}
 
-/*======== void add_mesh() ==========
-  Inputs:   struct matrix * polygons
-            struct matrix * vertices
-            struct matrix * faces
-  Adds vertices in correct order to polygon matrix
-  ====================*/
+//adds vertices to polygons
 void add_mesh(struct matrix *polygons, struct matrix *vertices, struct matrix *faces) {
   int f;
   int v0,v1,v2,v3;
@@ -123,9 +95,8 @@ void add_mesh(struct matrix *polygons, struct matrix *vertices, struct matrix *f
       vertices->m[0][v1], vertices->m[1][v1], vertices->m[2][v1],
       vertices->m[0][v2], vertices->m[1][v2], vertices->m[2][v2]
     );
-    //if 4th vertex exists
+    //quadrilateral
     if (v3 > 0) {
-      //then it's quadrilateral
       add_polygon(polygons,
         vertices->m[0][v0], vertices->m[1][v0], vertices->m[2][v0],
         vertices->m[0][v2], vertices->m[1][v2], vertices->m[2][v2],
@@ -135,4 +106,4 @@ void add_mesh(struct matrix *polygons, struct matrix *vertices, struct matrix *f
   }
   free_matrix(vertices);
   free_matrix(faces);
-} //end add_mesh
+}

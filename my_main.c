@@ -118,7 +118,7 @@ void my_main() {
     switch (op[i].opcode)
       {
         case MESH:
-          parse_obj(polygons, op[i].op.mesh.name);
+          obj_parser(polygons, op[i].op.mesh.name);
           matrix_mult(peek(systems), polygons);
           reflect = &white;
           if (op[i].op.mesh.constants != NULL) {
