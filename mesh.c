@@ -6,25 +6,29 @@
 #include "matrix.h"
 #include "draw.h"
 
-//goes through each line and parses args
+//parse helper function
+char * parse_helper(char *line) {
+  char * s = calloc (sizeof(char), 1);
+  strcpy(s, strsep(&line, "/"));
+  return s;
+}
+
+//parses each line for args
 char ** args_parser(char *line){
   char ** arr = calloc(sizeof(char*), 10);
   int i = 0;
   while (line) {
     arr[i] = strsep(&line, " ");
     if (strcmp(arr[i], "") != 0) {
-      char * s = calloc(sizeof(char), 1);
-      strcpy(s, strsep(&line, "/"));
-      arr[i] = s;
+      arr[i] = parse_helper(arr[i]);
       i++;
     }
   }
   return arr;
 }
 
-//parses .obj file for vertices and faces
+//parses .obj file for v and f
 void obj_parser(struct matrix *polygons, char *file) {
-
   struct matrix * vertices;
   struct matrix * faces;
 
@@ -62,10 +66,11 @@ void obj_parser(struct matrix *polygons, char *file) {
       add_mesh_point(faces, values, FACE);
     }
   }
+
   add_mesh(polygons, vertices, faces);
 }
 
-//adds points or faces to points
+//adds points or faces
 void add_mesh_point(struct matrix * points, double values[4], int type) {
 
   if ( points->lastcol == points->cols )
@@ -80,7 +85,7 @@ void add_mesh_point(struct matrix * points, double values[4], int type) {
   points->lastcol++;
 }
 
-//adds vertices to polygons
+//adds vertices to polygons matrix
 void add_mesh(struct matrix *polygons, struct matrix *vertices, struct matrix *faces) {
   int f;
   int v0,v1,v2,v3;

@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "draw.h"
 
+char * parse_helper(char *line);
 char ** args_parser(char *line);
 void obj_parser(struct matrix *polygons, char *file);
 void add_mesh_point( struct matrix *points, double values[4], int type);
