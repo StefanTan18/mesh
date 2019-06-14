@@ -14,7 +14,7 @@ char ** args_parser(char *line){
     arr[i] = strsep(&line, " ");
     if (strcmp(arr[i], "") != 0) {
       char * s = calloc(sizeof(char), 1);
-      strcpy(s, strsep(&line, "/"))
+      strcpy(s, strsep(&line, "/"));
       arr[i] = s;
       i++;
     }
