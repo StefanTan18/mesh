@@ -132,23 +132,6 @@ void my_main() {
         case SAVE_COORDS:
           copy_matrix(peek(systems), op[i].op.save_coordinate_system.p->s.m);
           break;
-        // case LIGHT:
-        //   symbol = lookup_symbol(op[i].op.light.p->name);
-        //   if (num_lights < MAX_LIGHTS) {
-        //     lights[num_lights][LOCATION][0] = symbol->s.l->l[0];
-        //     lights[num_lights][LOCATION][1] = symbol->s.l->l[1];
-        //     lights[num_lights][LOCATION][2] = symbol->s.l->l[2];
-        //
-        //     lights[num_lights][COLOR][RED] = symbol->s.l->c[0];
-        //     lights[num_lights][COLOR][GREEN] = symbol->s.l->c[1];
-        //     lights[num_lights][COLOR][BLUE] = symbol->s.l->c[2];
-        //
-        //     num_lights++;
-        //   }
-        //   else {
-        //     printf("Light limit reached");
-        //   }
-        //   break;
         case PUSH:
           printf("Push");
           push(systems);
