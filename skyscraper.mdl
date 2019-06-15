@@ -1,0 +1,4 @@
+move 250 0 0
+save_coord_system center
+mesh :skyscraper.obj
+display
