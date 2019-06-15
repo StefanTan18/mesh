@@ -114,12 +114,14 @@ void my_main() {
   print_symtab();
   for (i=0;i<lastop;i++) {
 
+    struct matrix *cs = peek(systems);
+
     printf("%d: ",i);
     switch (op[i].opcode)
       {
         case MESH:
           obj_parser(polygons, op[i].op.mesh.name);
-          matrix_mult(peek(systems), polygons);
+          matrix_mult(cs, polygons);
           reflect = &white;
           if (op[i].op.mesh.constants != NULL) {
             reflect = op[i].op.mesh.constants->s.c;
@@ -127,6 +129,26 @@ void my_main() {
           draw_polygons(polygons, t, zb, view, light, ambient, reflect);
           polygons->lastcol = 0;
           break;
+        case SAVE_COORDS:
+          copy_matrix(peek(systems), op[i].op.save_coordinate_system.p->s.m);
+          break;
+        // case LIGHT:
+        //   symbol = lookup_symbol(op[i].op.light.p->name);
+        //   if (num_lights < MAX_LIGHTS) {
+        //     lights[num_lights][LOCATION][0] = symbol->s.l->l[0];
+        //     lights[num_lights][LOCATION][1] = symbol->s.l->l[1];
+        //     lights[num_lights][LOCATION][2] = symbol->s.l->l[2];
+        //
+        //     lights[num_lights][COLOR][RED] = symbol->s.l->c[0];
+        //     lights[num_lights][COLOR][GREEN] = symbol->s.l->c[1];
+        //     lights[num_lights][COLOR][BLUE] = symbol->s.l->c[2];
+        //
+        //     num_lights++;
+        //   }
+        //   else {
+        //     printf("Light limit reached");
+        //   }
+        //   break;
         case PUSH:
           printf("Push");
           push(systems);
@@ -138,8 +160,8 @@ void my_main() {
         case MOVE:
           printf("Move");
           tmp = make_translate(op[i].op.move.d[0],op[i].op.move.d[1], op[i].op.move.d[2]);
-          matrix_mult(peek(systems), tmp);
-          copy_matrix(tmp, peek(systems));
+          matrix_mult(cs, tmp);
+          copy_matrix(tmp, cs);
           break;
         case ROTATE:
           printf("Rotate");
@@ -151,19 +173,22 @@ void my_main() {
           else
             tmp = make_rotZ(theta);
 
-          matrix_mult(peek(systems), tmp);
-          copy_matrix(tmp, peek(systems));
+          matrix_mult(cs, tmp);
+          copy_matrix(tmp, cs);
           break;
         case SCALE:
           printf("Scale");
           tmp = make_scale(op[i].op.scale.d[0],op[i].op.scale.d[1], op[i].op.scale.d[2]);
-          matrix_mult(peek(systems), tmp);
-          copy_matrix(tmp, peek(systems));
+          matrix_mult(cs, tmp);
+          copy_matrix(tmp, cs);
           break;
         case BOX:
           printf("Box");
           add_box(polygons, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
-          matrix_mult(peek(systems), polygons);
+          if (op[i].op.box.cs) {
+            cs = op[i].op.box.cs->s.m;
+          }
+          matrix_mult(cs, polygons);
           reflect = &white;
           if (op[i].op.box.constants != NULL) {
             reflect = op[i].op.box.constants->s.c;
@@ -174,7 +199,10 @@ void my_main() {
         case SPHERE:
           printf("Sphere");
           add_sphere(polygons, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
-          matrix_mult(peek(systems), polygons);
+          if (op[i].op.sphere.cs) {
+            cs = op[i].op.sphere.cs->s.m;
+          }
+          matrix_mult(cs, polygons);
           reflect = &white;
           if (op[i].op.sphere.constants != NULL) {
             reflect = op[i].op.sphere.constants->s.c;
@@ -185,7 +213,10 @@ void my_main() {
         case TORUS:
           printf("Torus");
           add_torus(polygons, op[i].op.torus.d[0],op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
-          matrix_mult(peek(systems), polygons);
+          if (op[i].op.torus.cs) {
+            cs = op[i].op.torus.cs->s.m;
+          }
+          matrix_mult(cs, polygons);
           reflect = &white;
           if (op[i].op.torus.constants != NULL) {
             reflect = op[i].op.torus.constants->s.c;
@@ -199,7 +230,7 @@ void my_main() {
         case LINE:
           printf("Line");
           add_edge(edges, op[i].op.line.p0[0],op[i].op.line.p0[1], op[i].op.line.p0[1], op[i].op.line.p1[0],op[i].op.line.p1[1], op[i].op.line.p1[1]);
-          matrix_mult(peek(systems), edges);
+          matrix_mult(cs, edges);
           draw_lines(edges, t, zb, g);
           edges->lastcol = 0;
           break;
