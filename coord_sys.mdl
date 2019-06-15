@@ -5,6 +5,8 @@ save_coord_system center
 //should show up
 sphere 0 0 0 100 center
 
+display
+
 //should NOT show up
 sphere 0 -200 50
 
