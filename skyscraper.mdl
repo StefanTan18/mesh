@@ -1,5 +1,5 @@
 move 250 250 0
-scale 30 30 30
+scale 10 10 10
 save_coord_system center
 mesh :skyscraper.obj
 display
